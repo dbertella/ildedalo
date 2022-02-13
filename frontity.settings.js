@@ -17,9 +17,11 @@ const settings = {
             ["Home", "/"],
             ["Chi Siamo", "/chi-siamo/"],
             ["I Nostri Corsi", "/i-nostri-corsi/"],
+            ["Come Iscriversi", "/come-iscriversi/"],
+            ["Workshop ed Eventi", "/workshop-ed-eventi"],
             ["Gli Spazi", "/gli-spazi/"],
-            ["Travel", "/category/travel/"],
-            ["Japan", "/tag/japan/"],
+            ["Contatti", "/contatti/"],
+            ["News", "/news/"],
           ],
           featured: {
             showOnList: false,
@@ -33,7 +35,7 @@ const settings = {
       state: {
         source: {
           url: "https://ildedaloadmin.wordpress.com/",
-          postsPage: "eventi",
+          postsPage: "news",
           homepage: "home",
         },
       },
