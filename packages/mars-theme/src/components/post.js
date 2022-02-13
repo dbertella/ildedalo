@@ -166,7 +166,7 @@ const Content = styled.div`
   }
 
   a {
-    color: rgb(31, 56, 197);
+    color: #784c15;
     text-decoration: underline;
   }
 

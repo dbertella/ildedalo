@@ -12,7 +12,6 @@ const Nav = ({ state }) => (
       // Check if the link matched the current page url
       const data = state.source.get(state.router.link);
       const isCurrentPage = data.route === link;
-
       return (
         <NavItem key={name}>
           {/* If link url is the current page, add `aria-current` for a11y */}
@@ -45,8 +44,8 @@ const NavContainer = styled.nav`
 const NavItem = styled.div`
   padding: 0;
   margin: 0 16px;
-  color: #fff;
-  font-size: 0.9em;
+  color: #232323;
+  font-size: 0.7em;
   box-sizing: border-box;
   flex-shrink: 0;
 
@@ -57,7 +56,7 @@ const NavItem = styled.div`
     border-bottom-color: transparent;
     /* Use for semantic approach to style the current link */
     &[aria-current="page"] {
-      border-bottom-color: #fff;
+      border-bottom-color: #232323;
     }
   }
 
