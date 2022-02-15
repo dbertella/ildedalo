@@ -20,8 +20,8 @@ const Item = ({ state, item }) => {
         <Title dangerouslySetInnerHTML={{ __html: item.title.rendered }} />
       </Link>
 
-      <div>
-        {/* If the post has an author, we render a clickable author text. */}
+      {/* <div>
+        If the post has an author, we render a clickable author text. 
         {author && (
           <StyledLink link={author.link}>
             <AuthorName>
@@ -33,7 +33,7 @@ const Item = ({ state, item }) => {
           {" "}
           on <b>{date.toDateString()}</b>
         </PublishDate>
-      </div>
+      </div> */}
 
       {/*
        * If the want to show featured media in the
@@ -54,8 +54,8 @@ const Item = ({ state, item }) => {
 // Connect the Item to gain access to `state` as a prop
 export default connect(Item);
 
-const Title = styled.h1`
-  font-size: 2rem;
+const Title = styled.h2`
+  font-size: 1.5rem;
   color: rgba(12, 17, 43);
   margin: 0;
   padding-top: 24px;

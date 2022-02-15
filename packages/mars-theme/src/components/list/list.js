@@ -11,8 +11,8 @@ const List = ({ state }) => {
       {/* If the list is a taxonomy, we render a title. */}
       {data.isTaxonomy && (
         <Header>
-          {data.taxonomy}:{" "}
-          <b>{decode(state.source[data.taxonomy][data.id].name)}</b>
+          {/* {data.taxonomy}:{" "} */}
+          <Title>{decode(state.source[data.taxonomy][data.id].name)}</Title>
         </Header>
       )}
 
@@ -47,4 +47,11 @@ const Header = styled.h3`
   font-weight: 300;
   text-transform: capitalize;
   color: rgba(12, 17, 43, 0.9);
+`;
+
+const Title = styled.h1`
+  margin: 0;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: rgba(12, 17, 43);
 `;
