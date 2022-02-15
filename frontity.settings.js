@@ -16,7 +16,7 @@ const settings = {
           menu: [
             ["Home", "/"],
             ["Chi Siamo", "/chi-siamo/"],
-            ["I Nostri Corsi", "/category/i-nostri-corsi/"],
+            ["I Nostri Corsi", "/i-nostri-corsi/"],
             ["Workshop ed Eventi", "/workshop-ed-eventi/"],
             ["Gli Spazi", "/gli-spazi/"],
             ["Contatti", "/contatti/"],

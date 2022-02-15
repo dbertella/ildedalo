@@ -6,6 +6,7 @@ import Post from "./post";
 import Loading from "./loading";
 import Title from "./title";
 import PageError from "./page-error";
+import DedaloClasses from "./DedaloClasses";
 
 /**
  * Theme is the root React component of our theme. The one we will export
@@ -89,14 +90,18 @@ const Theme = ({ state }) => {
 
       {/* Add the main section. It renders a different component depending
       on the type of URL we are in. */}
-      <Main>
+
+      <div>
         <Switch>
           <Loading when={data.isFetching} />
+
           <List when={data.isArchive} />
+
+          <DedaloClasses when={data.route === "/i-nostri-corsi/"} />
           <Post when={data.isPostType} />
           <PageError when={data.isError} />
         </Switch>
-      </Main>
+      </div>
     </>
   );
 };

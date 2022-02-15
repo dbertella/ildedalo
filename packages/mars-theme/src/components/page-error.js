@@ -1,4 +1,5 @@
 import { styled, connect } from "frontity";
+import { Main } from "./Main";
 
 const description404 = (
   <>
@@ -25,10 +26,12 @@ const Page404 = ({ state }) => {
   const title404 = "Oops! 404";
 
   return (
-    <Container>
-      <Title>{data.is404 ? title404 : title}</Title>
-      <Description>{data.is404 ? description404 : description}</Description>
-    </Container>
+    <Main>
+      <Container>
+        <Title>{data.is404 ? title404 : title}</Title>
+        <Description>{data.is404 ? description404 : description}</Description>
+      </Container>
+    </Main>
   );
 };
 

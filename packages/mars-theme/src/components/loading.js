@@ -1,4 +1,5 @@
 import { styled, keyframes, css } from "frontity";
+import { Main } from "./Main";
 
 const scale = keyframes`
   0% {transform: scaley(1.0)}
@@ -7,15 +8,17 @@ const scale = keyframes`
 `;
 
 const Loading = () => (
-  <Container>
-    <div>
-      <div css={bar(1)} />
-      <div css={bar(2)} />
-      <div css={bar(3)} />
-      <div css={bar(4)} />
-      <div css={bar(5)} />
-    </div>
-  </Container>
+  <Main>
+    <Container>
+      <div>
+        <div css={bar(1)} />
+        <div css={bar(2)} />
+        <div css={bar(3)} />
+        <div css={bar(4)} />
+        <div css={bar(5)} />
+      </div>
+    </Container>
+  </Main>
 );
 
 export default Loading;
