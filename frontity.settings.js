@@ -41,6 +41,14 @@ const settings = {
     },
     "@frontity/tiny-router",
     "@frontity/html2react",
+    {
+      name: "@frontity/google-tag-manager-analytics",
+      state: {
+        googleTagManagerAnalytics: {
+          containerId: "G-WJMZCJ1BG1",
+        },
+      },
+    },
   ],
 };
 

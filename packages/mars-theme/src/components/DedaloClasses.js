@@ -13,25 +13,27 @@ const DedaloClasses = (props) => {
   }, []);
 
   const data = props.state.source.get(CLASSES_CATEGORY);
-  // Load the post, but only if the data is ready.
-  return data.isReady ? (
+  return (
     <>
       <Post {...props} />
-      <Main>
-        <Container>
-          {data.items?.map(({ type, id }) => {
-            const item = props.state.source[type][id];
-            return (
-              <ItemWrap key={item.id}>
-                <Item item={item} />
-              </ItemWrap>
-            );
-          })}
-        </Container>
-      </Main>
+      {data.isReady ? (
+        <Main>
+          <Container>
+            {data.items?.map(({ type, id }) => {
+              const item = props.state.source[type][id];
+              return (
+                <ItemWrap key={item.id}>
+                  <Item item={item} />
+                </ItemWrap>
+              );
+            })}
+          </Container>
+        </Main>
+      ) : (
+        <Loading />
+      )}
+      ;
     </>
-  ) : (
-    <Loading />
   );
 };
 
