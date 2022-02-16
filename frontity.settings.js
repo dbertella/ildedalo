@@ -3,7 +3,7 @@ const settings = {
   state: {
     frontity: {
       url: "https://ildedalo.com",
-      title: "Il dedalo 🌿 Soul Space",
+      title: "Il Dedalo 🌿 Soul Space",
       description:
         "Il Dedalo è uno spazio per l'anima, la creatività, la cura e la bellezza di condividere.",
     },

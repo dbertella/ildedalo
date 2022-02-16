@@ -15,19 +15,14 @@ const Item = ({ state, item }) => {
   const date = new Date(item.date);
 
   return (
-    <article>
+    <Article>
       <Link link={item.link}>
         <Title dangerouslySetInnerHTML={{ __html: item.title.rendered }} />
         {state.theme.featured.showOnList && (
           <FeaturedMedia id={item.featured_media} />
         )}
       </Link>
-
-      {/* If the post has an excerpt (short summary text), we render it */}
-      {item.excerpt && (
-        <Excerpt dangerouslySetInnerHTML={{ __html: item.excerpt.rendered }} />
-      )}
-    </article>
+    </Article>
   );
 };
 
@@ -38,12 +33,18 @@ const Title = styled.h2`
   font-size: 1.5rem;
   color: rgba(12, 17, 43);
   margin: 0;
-  padding-top: 24px;
-  padding-bottom: 8px;
+  padding: 8px 0;
   box-sizing: border-box;
+  text-align: center;
+  background: rgba(62, 59, 63, 0.7);
+  color: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 `;
 
-const Excerpt = styled.div`
-  line-height: 1.6em;
-  color: rgba(12, 17, 43, 0.8);
+const Article = styled.article`
+  position: relative;
+  min-height: 300px;
 `;
