@@ -40,6 +40,29 @@ const marsTheme = {
       closeMobileMenu: ({ state }) => {
         state.theme.isMobileMenuOpen = false;
       },
+      beforeSSR: async ({ state, actions, libraries }) => {
+        // prefetch  extra content from dummy holder page
+        const response = await libraries.source.api.get({
+          endpoint: "pages",
+          params: {
+            _embed: true,
+            parent: 33,
+          },
+        });
+
+        // add the content to our data
+
+        const res = await response.json();
+        await actions.source.fetch(`/i-nostri-corsi/`);
+        await Promise.all(
+          res.map((r) => actions.source.fetch(`/i-nostri-corsi/${r.slug}`))
+        );
+
+        Object.assign(state.source.data["/i-nostri-corsi/"], {
+          childrenPages: res.sort((a, b) => a.menu_order - b.menu_order),
+          isPageWithChildren: true,
+        });
+      },
     },
   },
   libraries: {

@@ -6,7 +6,6 @@ import Post from "./post";
 import Loading from "./loading";
 import Title from "./title";
 import PageError from "./page-error";
-import DedaloClasses from "./DedaloClasses";
 import { Footer } from "./Footer";
 
 /**
@@ -20,7 +19,6 @@ import { Footer } from "./Footer";
 const Theme = ({ state }) => {
   // Get information about the current URL.
   const data = state.source.get(state.router.link);
-
   return (
     <>
       {/* Add some metatags to the <head> of the HTML. */}
@@ -93,7 +91,7 @@ const Theme = ({ state }) => {
 
             <List when={data.isArchive} />
 
-            <DedaloClasses when={data.route === "/i-nostri-corsi/"} />
+            {/* <DedaloClasses when={data.isPageWithChildren} /> */}
             <Post when={data.isPostType} />
             <PageError when={data.isError} />
           </Switch>

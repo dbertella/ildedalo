@@ -20,7 +20,7 @@ const settings = {
             ["Workshop ed Eventi", "/workshop-ed-eventi/"],
             ["Gli Spazi", "/gli-spazi/"],
             ["Contatti", "/contatti/"],
-            ["News", "/category/news/"],
+            ["News", "/news/"],
           ],
           featured: {
             showOnList: true,

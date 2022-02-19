@@ -3,6 +3,7 @@ import { connect, styled } from "frontity";
 import List from "./list";
 import FeaturedMedia from "./featured-media";
 import { Main } from "./Main";
+import Item from "./list/list-item-corsi";
 
 /**
  * The Post component that Mars uses to render any kind of "post type", like
@@ -69,6 +70,13 @@ const Post = ({ state, actions, libraries }) => {
               <Html2React html={post.content.rendered} />
             </Content>
           )}
+          <DesktopGrid>
+            {data.isPageWithChildren &&
+              data.childrenPages?.map(({ type, id }) => {
+                const item = state.source[type][id];
+                return <Item key={item.id} item={item} />;
+              })}
+          </DesktopGrid>
         </Container>
       </Main>
     </>
@@ -211,5 +219,15 @@ const Content = styled.div`
       float: left;
       margin-right: 24px;
     }
+  }
+`;
+
+const DesktopGrid = styled.div`
+  @media (min-width: 420px) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* This is better for small screens, once min() is better supported */
+    /* grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); */
+    gap: 1rem;
   }
 `;
