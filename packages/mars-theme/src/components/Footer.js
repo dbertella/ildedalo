@@ -4,7 +4,7 @@ import Link from "@frontity/components/link";
 export const Footer = () => (
   <Main>
     <Container>
-      <Box css={{ flex: 2 }}>
+      <Box>
         <h4>Link Utili</h4>
         <ListWrap>
           <ListItem>
@@ -29,6 +29,11 @@ export const Footer = () => (
           🌿
         </span>
         Il Dedalo si trova a Casatenovo, in via Garibaldi 5
+        <ListItem>
+          <a href="https://www.facebook.com/ildedalo">Facebook</a> ·{" "}
+          <a href="https://www.instagram.com/_ildedalo_/">Instagram</a> ·{" "}
+          <a href="https://goo.gl/maps/cKBwARWrqwyhCdYT7">Maps</a>
+        </ListItem>
       </Box>
     </Container>
   </Main>
@@ -42,16 +47,16 @@ const Main = styled.div`
 `;
 const Container = styled.div`
   width: 800px;
-  display: flex;
-  flex-wrap: wrap;
   margin: 0;
   padding: 24px;
   font-size: 0.9rem;
+  @media (min-width: 420px) {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+  }
 `;
-const Box = styled.div`
-  flex: 1;
-  width: 200px;
-`;
+const Box = styled.div``;
 const ListWrap = styled.ul`
   padding: 0;
 `;
