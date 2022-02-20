@@ -3,6 +3,9 @@ import image from "@frontity/html2react/processors/image";
 import iframe from "@frontity/html2react/processors/iframe";
 import link from "@frontity/html2react/processors/link";
 
+const CORSI_URL = "/i-nostri-corsi/";
+const CORSI_PAGE_ID = 33;
+
 const marsTheme = {
   name: "@frontity/mars-theme",
   roots: {
@@ -46,19 +49,19 @@ const marsTheme = {
           endpoint: "pages",
           params: {
             _embed: true,
-            parent: 33,
+            parent: CORSI_PAGE_ID,
           },
         });
 
         // add the content to our data
-
         const res = await response.json();
-        await actions.source.fetch(`/i-nostri-corsi/`);
+
+        await actions.source.fetch(CORSI_URL);
         await Promise.all(
-          res.map((r) => actions.source.fetch(`/i-nostri-corsi/${r.slug}`))
+          res.map((r) => actions.source.fetch(`${CORSI_URL}${r.slug}`))
         );
 
-        Object.assign(state.source.data["/i-nostri-corsi/"], {
+        Object.assign(state.source.data[CORSI_URL], {
           childrenPages: res.sort((a, b) => a.menu_order - b.menu_order),
           isPageWithChildren: true,
         });

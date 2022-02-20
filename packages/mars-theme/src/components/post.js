@@ -4,6 +4,7 @@ import List from "./list";
 import FeaturedMedia from "./featured-media";
 import { Main } from "./Main";
 import Item from "./list/list-item-corsi";
+import Link from "@frontity/components/link";
 
 /**
  * The Post component that Mars uses to render any kind of "post type", like
@@ -77,6 +78,11 @@ const Post = ({ state, actions, libraries }) => {
                 return <Item key={item.id} item={item} />;
               })}
           </DesktopGrid>
+          {!!post.parent && (
+            <BackToParent>
+              <Link link="i-nostri-corsi/">Torna ai Corsi</Link>
+            </BackToParent>
+          )}
         </Container>
       </Main>
     </>
@@ -96,6 +102,13 @@ const Title = styled.h1`
   margin-top: 24px;
   margin-bottom: 8px;
   color: rgba(12, 17, 43);
+`;
+
+const BackToParent = styled.flex`
+  display: flex;
+  justify-content: center;
+  color: #784c15;
+  text-decoration: underline;
 `;
 
 /**
