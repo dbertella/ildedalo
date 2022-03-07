@@ -1,16 +1,18 @@
-import { connect, styled } from "frontity";
+import { connect, styled, Image } from "frontity";
 import Link from "./link";
 import Nav from "./nav";
 import MobileMenu from "./menu";
+import logo from "../images/logo.png";
 
 const Header = ({ state }) => {
   return (
     <>
       <Container>
         <StyledLink link="/">
-          <Title>{state.frontity.title}</Title>
+          <Title>Il Dedalo</Title>
+          <Logo />
         </StyledLink>
-        <Description>{state.frontity.description}</Description>
+        <Description>Soul Space</Description>
         <MobileMenu />
       </Container>
       <Nav />
@@ -34,14 +36,24 @@ const Container = styled.div`
 
 const Title = styled.h2`
   margin: 0;
-  margin-bottom: 16px;
+  font-weight: 400;
 `;
 
 const Description = styled.h4`
   margin: 0;
   color: #232323;
+  font-weight: 400;
 `;
 
 const StyledLink = styled(Link)`
   text-decoration: none;
+  display: flex;
+  align-items: center;
+`;
+
+const Logo = styled.div`
+  width: 100px;
+  height: 50px;
+  background: url(${logo}) center center;
+  background-size: contain;
 `;

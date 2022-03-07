@@ -33,49 +33,10 @@ const Theme = ({ state }) => {
 
         <meta name="description" content={state.frontity.description} />
         <html lang="it" />
-        <link rel="icon" href="/static/icon-48x48.png" />
+        <link rel="icon" href="/static/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
         <link rel="manifest" href="/static/manifest.webmanifest" />
         <meta name="theme-color" content="#669999" />
-        <link
-          rel="apple-touch-icon"
-          sizes="48x48"
-          href="/static/icon-48x48.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="72x72"
-          href="/static/icon-72x72.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="96x96"
-          href="/static/icon-96x96.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="144x144"
-          href="/static/icon-144x144.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="192x192"
-          href="/static/icon-192x192.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="256x256"
-          href="/static/icon-256x256.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="384x384"
-          href="/static/icon-384x384.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="512x512"
-          href="/static/icon-512x512.png"
-        />
       </Head>
 
       {/* Add some global styles for the whole site, like body or a's. 
