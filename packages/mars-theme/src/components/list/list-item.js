@@ -36,7 +36,8 @@ export default connect(Item);
 
 const Title = styled.h2`
   font-size: 1.5rem;
-  color: rgba(12, 17, 43);
+  color: rgba(12, 17, 43, 0.8);
+  font-weight: 400;
   margin: 0;
   padding-top: 24px;
   padding-bottom: 8px;

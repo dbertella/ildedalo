@@ -71,7 +71,7 @@ const globalStyles = css`
     margin: 0;
     font-family: "Montserrat", BlinkMacSystemFont, "Segoe UI", Roboto,
       "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 20px;
+    font-size: 18px;
   }
   a,
   a:visited {

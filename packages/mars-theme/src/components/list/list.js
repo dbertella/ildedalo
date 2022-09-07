@@ -57,4 +57,6 @@ const Title = styled.h1`
   margin-top: 24px;
   margin-bottom: 8px;
   color: rgba(12, 17, 43);
+  color: rgba(12, 17, 43, 0.8);
+  font-weight: 400;
 `;
