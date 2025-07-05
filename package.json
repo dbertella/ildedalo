@@ -11,10 +11,10 @@
     "npm": ">=6.0.0"
   },
   "scripts": {
-    "dev": "frontity dev",
-    "build": "frontity build",
+    "dev": "NODE_OPTIONS=\"--openssl-legacy-provider\" frontity dev",
+    "build": "NODE_OPTIONS=\"--openssl-legacy-provider\" frontity build",
     "postbuild": "cp ./packages/mars-theme/src/static/* ./build/static/",
-    "serve": "frontity serve"
+    "serve": "NODE_OPTIONS=\"--openssl-legacy-provider\" frontity serve"
   },
   "prettier": {},
   "dependencies": {
