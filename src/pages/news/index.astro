@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.jsx';
 import BlogList from '../../components/BlogList.jsx';
 import Footer from '../../components/Footer.jsx';
+import FeatureImage from '../../components/FeatureImage.jsx';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -94,6 +95,13 @@ for (const post of posts) {
   url="https://ildedalo.com/news"
 >
   <Header slot="header" client:load />
+  
+  <FeatureImage 
+    imageUrl={undefined}
+    title="News"
+    fallbackImage="/il-dedalo_mg_3498.jpg"
+    client:load
+  />
   
   <div class="main-content">
     <BlogList posts={posts} title="News" isTaxonomy={false} isAuthor={false} client:load />

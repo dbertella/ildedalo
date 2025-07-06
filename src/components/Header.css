@@ -1,7 +1,14 @@
 .header {
   width: 100%;
-  background: white;
-  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffea;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 234, 1) 55%,
+    rgba(255, 255, 234, 0) 100%
+  );
 }
 
 .container {
@@ -26,14 +33,17 @@
 .logo {
   width: 200px;
   height: 100px;
-  background: url('/logo.png') center center;
+  background: url('/dedalo.png') center center;
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-direction: column;
+
   width: 100%;
 }
 
@@ -119,7 +129,7 @@
 
 /* Mobile Menu Overlay Styles */
 .menu-overlay {
-  background-color: #ffffea;
+  background: linear-gradient(135deg, #f7f4e9 0%, #f0e68c 50%, #f4d03f 100%);
   width: 100vw;
   height: 100vh;
   overflow: hidden auto;
@@ -269,5 +279,14 @@
   
   .nav-container {
     display: none;
+  }
+  
+  .logo {
+    width: 150px;
+    height: 75px;
+  }
+  
+  .container {
+    padding: 16px;
   }
 } 

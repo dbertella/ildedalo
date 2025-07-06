@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import FeatureImage from '../components/FeatureImage.jsx';
 ---
 
 <Layout 
@@ -10,6 +11,13 @@ import Footer from '../components/Footer.jsx';
   url="https://ildedalo.com/404"
 >
   <Header slot="header" />
+  
+  <FeatureImage 
+    imageUrl={undefined}
+    title="404 - Pagina non trovata"
+    fallbackImage="/il-dedalo_mg_3323.jpg"
+    client:load
+  />
   
   <div class="error-container">
     <h1>404</h1>

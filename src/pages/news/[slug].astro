@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.jsx';
 import BlogPost from '../../components/BlogPost.jsx';
 import Footer from '../../components/Footer.jsx';
+import FeatureImage from '../../components/FeatureImage.jsx';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -127,6 +128,12 @@ if (postData.excerpt.rendered) {
   url={`https://ildedalo.com/news/${slug}`}
 >
   <Header slot="header" client:load />
+  
+  <FeatureImage 
+    imageUrl={postData._embedded?.['wp:featuredmedia']?.[0]?.source_url}
+    title={postData.title.rendered}
+    client:load
+  />
   
   <div class="main-content">
     <BlogPost post={postData} childrenPages={childrenPages as any} client:load />

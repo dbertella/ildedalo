@@ -1,0 +1,276 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.jsx";
+import Footer from "../components/Footer.jsx";
+import FeatureImage from "../components/FeatureImage.jsx";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
+import { WORDPRESS_API_BASE } from "../config/wordpress.js";
+import { downloadImage } from "../utils/imageUtils.js";
+import { decodeHtmlEntitiesInObject, cleanTextInArray } from "../utils/htmlUtils.js";
+
+// Define types for WordPress response
+interface WordPressContent {
+  ID: number;
+  title: string;
+  content: string;
+  excerpt: string;
+  date: string;
+  modified: string;
+  slug: string;
+  featured_image?: string;
+  type: "post" | "page";
+}
+
+let contentData: WordPressContent | null = null;
+let localImages: Record<string, string> = {};
+let subpages: any[] = [];
+
+try {
+  // Fetch the i-nostri-corsi post
+  console.log("Trying to fetch i-nostri-corsi post from WordPress.com API");
+  const { data: rawPost } = await axios.get(
+    `${WORDPRESS_API_BASE}/posts/slug:i-nostri-corsi`
+  );
+
+  if (rawPost) {
+    const post = rawPost as any;
+    contentData = decodeHtmlEntitiesInObject({
+      ID: post.ID,
+      title: post.title || "",
+      content: post.content || "",
+      excerpt: post.excerpt || "",
+      date: post.date,
+      modified: post.modified,
+      slug: post.slug,
+      featured_image: (post.featured_image ?? "") as string,
+      type: "post",
+    });
+    console.log(
+      "Successfully fetched i-nostri-corsi post from WordPress.com API"
+    );
+
+    // Fetch subpages using the specific endpoint for parent_id=33
+    console.log("Fetching subpages with parent_id=33...");
+    try {
+      const { data: subpagesResponse } = await axios.get(
+        `${WORDPRESS_API_BASE}/posts/?type=page&parent_id=33`
+      );
+
+      if (subpagesResponse && subpagesResponse.posts) {
+        subpages = cleanTextInArray(
+          subpagesResponse.posts
+            .map((page) => ({
+              id: page.ID,
+              title: page.title || "",
+              excerpt: page.excerpt || "",
+              slug: page.slug,
+              featured_image: page.featured_image || "",
+              date: page.date || "", // Creation date
+              modified: page.modified || "", // Last modified date
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by creation date, oldest first
+        );
+        
+        console.log(`Found ${subpages.length} subpages with parent_id=33 (ordered by creation date)`);
+        subpages.forEach((page) => {
+          console.log(`- ${page.title} (ID: ${page.id}, Slug: ${page.slug}, Created: ${page.date}, Modified: ${page.modified})`);
+        });
+      } else {
+        console.log("No subpages found with parent_id=33");
+      }
+    } catch (subpagesError) {
+      console.error("Error fetching subpages:", subpagesError);
+    }
+  } else {
+    console.log("i-nostri-corsi post not found, redirecting to 404");
+    return Astro.redirect("/404");
+  }
+} catch (postError) {
+  console.log("i-nostri-corsi post not found, redirecting to 404");
+  return Astro.redirect("/404");
+}
+
+// Process images if we have content
+if (contentData && contentData.content) {
+  // Find all image URLs in the content
+  const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
+  let match;
+  let newContent = contentData.content;
+
+  while ((match = imgRegex.exec(contentData.content)) !== null) {
+    const imgUrl = match[1] as string;
+    const imgName = path.basename(imgUrl.split("?")[0]);
+    const localPath = path.join(process.cwd(), "public", imgName);
+    const publicPath = `/${imgName}`;
+
+    // Download if not already present
+    if (!fs.existsSync(localPath)) {
+      try {
+        await downloadImage(imgUrl, localPath);
+        console.log(`Downloaded image: ${imgName}`);
+      } catch (e) {
+        console.error("Failed to download image:", imgUrl, e);
+      }
+    }
+
+    localImages[imgUrl] = publicPath;
+    // Replace src in content
+    newContent = newContent.replace(new RegExp(imgUrl, "g"), publicPath);
+  }
+
+  contentData.content = newContent;
+}
+---
+
+<Layout
+  title={`${contentData?.title || "I Nostri Corsi"} - Il Dedalo 🌿 Soul Space`}
+  description={contentData?.excerpt ||
+    "Scopri i nostri corsi di yoga e benessere presso Il Dedalo."}
+  url="https://ildedalo.com/i-nostri-corsi"
+>
+  <Header slot="header" client:load />
+
+  <FeatureImage
+    imageUrl={contentData?.featured_image}
+    title={contentData?.title || "I Nostri Corsi"}
+    client:load
+  />
+
+  <div class="main-content">
+    {contentData && <div class="post-content" set:html={contentData.content} />}
+
+    {
+      subpages.length > 0 && (
+        <div class="subpages-section">
+          <h2>I Nostri Corsi</h2>
+          <div class="subpages-grid">
+            {subpages.map((subpage) => (
+              <div class="subpage-item">
+                <a href={`/${subpage.slug}`} class="subpage-link">
+                  {subpage.featured_image && (
+                    <div class="subpage-image">
+                      <img src={subpage.featured_image} alt={subpage.title} />
+                    </div>
+                  )}
+                  <div class="subpage-content">
+                    <h3 class="subpage-title">{subpage.title}</h3>
+                  </div>
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .post-content {
+    margin-bottom: 3rem;
+  }
+
+  .subpages-section {
+    margin-top: 3rem;
+  }
+
+  .subpages-section h2 {
+    font-size: 2.5rem;
+    color: rgba(12, 17, 43, 0.8);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .subpages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+  }
+
+  .subpage-item {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    background: white;
+  }
+
+  .subpage-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+
+  .subpage-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .subpage-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+  }
+
+  .subpage-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease;
+  }
+
+  .subpage-item:hover .subpage-image img {
+    transform: scale(1.05);
+  }
+
+  .subpage-content {
+    padding: 16px;
+  }
+
+  .subpage-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: rgba(12, 17, 43, 0.9);
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+  }
+
+  .subpage-excerpt {
+    color: rgba(12, 17, 43, 0.7);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 1rem;
+    }
+    
+    .subpages-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .subpages-section h2 {
+      font-size: 2rem;
+    }
+
+    .subpage-content {
+      padding: 16px;
+    }
+  }
+</style>

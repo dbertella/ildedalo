@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import FeatureImage from '../components/FeatureImage.jsx';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -91,6 +92,12 @@ if (contentData && contentData.content) {
   url="https://ildedalo.com"
 >
   <Header slot="header" client:load />
+  
+  <FeatureImage 
+    imageUrl={contentData?.featured_image}
+    title={contentData?.title || "Il Dedalo 🌿 Soul Space"}
+    client:load
+  />
   
   <div class="main-content">
     {contentData && (

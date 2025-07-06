@@ -8,12 +8,6 @@ const BlogPost = ({ post, childrenPages = [] }) => {
   return (
     <article className="blog-post">
       <div className="post-container">
-        <div>
-          <h1 
-            className="post-title" 
-            dangerouslySetInnerHTML={{ __html: post.title.rendered }} 
-          />
-        </div>
 
         {featuredImage && (
           <div className="featured-image-container">
@@ -41,9 +35,13 @@ const BlogPost = ({ post, childrenPages = [] }) => {
           </div>
         )}
 
-        {post.parent && (
+        {post.parent ? (
           <div className="back-to-parent">
             <Link href="/i-nostri-corsi/">Torna ai Corsi</Link>
+          </div>
+        ) : (
+          <div className="back-to-parent">
+            <Link href="/news/">Torna alle News</Link>
           </div>
         )}
       </div>
