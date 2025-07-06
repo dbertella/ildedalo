@@ -39,6 +39,7 @@ let posts: WordPressPost[] = [];
 
 try {
   const { data: rawPosts } = await axios.get(`${WORDPRESS_API_BASE}/posts`, {
+    timeout: 1000, // 1 second timeout
     params: {
       number: 10,
       fields: 'ID,slug,title,excerpt,content,date,modified,author,featured_image'

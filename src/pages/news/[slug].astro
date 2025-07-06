@@ -62,7 +62,9 @@ let childrenPages: any[] = [];
 
 try {
   console.log(`Fetching post with slug: ${slug}`);
-  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:${slug}`);
+  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:${slug}`, {
+    timeout: 1000 // 1 second timeout
+  });
   
   console.log('Raw post data:', rawPost);
   

@@ -30,7 +30,9 @@ let localImages: Record<string, string> = {};
 try {
   // First try to fetch as a post with slug 'home'
   console.log('Trying to fetch home as post from WordPress.com API');
-  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:home`);
+  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:home`, {
+    timeout: 1000 // 1 second timeout
+  });
   
   if (rawPost) {
     const post = rawPost as any;
@@ -50,7 +52,7 @@ try {
     return Astro.redirect('/404');
   }
 } catch (postError) {
-  console.log('Home post not found, redirecting to 404');
+  console.log('Home post not found or timeout, redirecting to 404');
   return Astro.redirect('/404');
 }
 

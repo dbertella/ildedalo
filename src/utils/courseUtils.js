@@ -120,7 +120,7 @@ async function performFetch() {
   const apiPromise = axios.get(
     `${WORDPRESS_API_BASE}/posts/?type=page&parent_id=33&per_page=20`,
     {
-      timeout: 2000, // 2 second timeout for faster fallback
+      timeout: 1000, // 1 second timeout for faster fallback
       headers: {
         'Cache-Control': 'max-age=300'
       }
@@ -128,7 +128,7 @@ async function performFetch() {
   );
 
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('API timeout')), 1500); // 1.5 second timeout
+    setTimeout(() => reject(new Error('API timeout')), 800); // 800ms timeout
   });
 
   try {

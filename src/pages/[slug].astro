@@ -6,8 +6,8 @@ import FeatureImage from "../components/FeatureImage.jsx";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { WORDPRESS_API_BASE } from "../config/wordpress.js";
 import { downloadImage } from "../utils/imageUtils.js";
+import { fetchPost } from "../utils/postUtils.js";
 import Link from "../components/Link";
 
 const { slug } = Astro.params;
@@ -35,33 +35,8 @@ let contentData: WordPressContent | null = null;
 let localImages: Record<string, string> = {};
 
 try {
-  // Fetch as a post
-  console.log(`Trying to fetch post with slug: ${slug}`);
-  const { data: rawPost } = await axios.get(
-    `${WORDPRESS_API_BASE}/posts/slug:${slug}`
-  );
-
-  if (rawPost) {
-    const post = rawPost as any;
-    contentData = {
-      ID: post.ID,
-      title: post.title || "",
-      content: post.content || "",
-      excerpt: post.excerpt || "",
-      date: post.date,
-      modified: post.modified,
-      slug: post.slug,
-      featured_image: (post.featured_image ?? "") as string,
-      type: "post",
-      parent: post.parent,
-    };
-    console.log(
-      `Successfully fetched post with slug ${slug} from WordPress.com API`
-    );
-  } else {
-    console.log(`Post not found, redirecting to 404 for: ${slug}`);
-    return Astro.redirect("/404");
-  }
+  // Fetch post using optimized utility
+  contentData = await fetchPost(slug);
 } catch (postError) {
   console.log(`Post not found, redirecting to 404 for: ${slug}`);
   return Astro.redirect("/404");
