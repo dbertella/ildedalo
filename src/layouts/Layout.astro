@@ -5,9 +5,14 @@ import "../styles/global.css";
 export interface Props {
   title: string;
   description?: string;
+  url?: string;
 }
 
-const { title, description = "Il Dedalo - Centro di Formazione" } = Astro.props;
+const { 
+  title, 
+  description = "Il Dedalo è uno spazio per l'anima, la creatività, la cura e la bellezza di condividere.",
+  url = "https://ildedalo.com"
+} = Astro.props;
 
 // Fetch menu data on the server side
 const menuItems = await fetchMenuFromWordPress();
@@ -24,6 +29,21 @@ const hierarchicalMenu = buildMenuHierarchy(menuItems);
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#669999" />
     <meta name="description" content={description} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:title" content="Il Dedalo 🌿 Soul Space" />
+    <meta property="og:description" content={description} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={url} />
+    <meta property="twitter:title" content="Il Dedalo 🌿 Soul Space" />
+    <meta property="twitter:description" content={description} />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={url} />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -110,7 +110,11 @@ if (contentData && contentData.content) {
 }
 ---
 
-<Layout title={contentData?.title || "Pagina"}>
+<Layout 
+  title={`${contentData?.title || "Pagina"} - Il Dedalo 🌿 Soul Space`}
+  description={contentData?.excerpt || "Il Dedalo è uno spazio per l'anima, la creatività, la cura e la bellezza di condividere."}
+  url={`https://ildedalo.com/${slug}`}
+>
   <Header slot="header" client:load />
   <div class="main-content">
     {contentData && (

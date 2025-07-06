@@ -121,7 +121,11 @@ if (postData.excerpt.rendered) {
 }
 ---
 
-<Layout title={postData.title.rendered} description={postData.excerpt.rendered.replace(/<[^>]*>/g, '')}>
+<Layout 
+  title={`${postData.title.rendered} - Il Dedalo 🌿 Soul Space`} 
+  description={postData.excerpt.rendered.replace(/<[^>]*>/g, '')}
+  url={`https://ildedalo.com/news/${slug}`}
+>
   <Header slot="header" client:load />
   
   <div class="main-content">

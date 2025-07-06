@@ -85,7 +85,11 @@ if (contentData && contentData.content) {
 }
 ---
 
-<Layout title={contentData?.title || "Il Dedalo - Centro di Formazione"}>
+<Layout 
+  title={contentData?.title || "Il Dedalo 🌿 Soul Space"} 
+  description={contentData?.excerpt || "Il Dedalo è uno spazio per l'anima, la creatività, la cura e la bellezza di condividere."}
+  url="https://ildedalo.com"
+>
   <Header slot="header" client:load />
   
   <div class="main-content">
