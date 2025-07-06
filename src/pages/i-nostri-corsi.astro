@@ -8,7 +8,8 @@ import fs from "fs";
 import path from "path";
 import { WORDPRESS_API_BASE } from "../config/wordpress.js";
 import { downloadImage } from "../utils/imageUtils.js";
-import { decodeHtmlEntitiesInObject, cleanTextInArray } from "../utils/htmlUtils.js";
+import { decodeHtmlEntitiesInObject } from "../utils/htmlUtils.js";
+import { fetchSubpages } from "../utils/courseUtils.js";
 
 // Define types for WordPress response
 interface WordPressContent {
@@ -50,10 +51,16 @@ let localImages: Record<string, string> = {};
 let subpages: Subpage[] = [];
 
 try {
-  // Fetch the i-nostri-corsi post
+  // Fetch the i-nostri-corsi post with timeout and caching
   console.log("Trying to fetch i-nostri-corsi post from WordPress.com API");
   const { data: rawPost } = await axios.get(
-    `${WORDPRESS_API_BASE}/posts/slug:i-nostri-corsi`
+    `${WORDPRESS_API_BASE}/posts/slug:i-nostri-corsi`,
+    {
+      timeout: 5000, // 5 second timeout
+      headers: {
+        'Cache-Control': 'max-age=300' // Cache for 5 minutes
+      }
+    }
   );
 
   if (rawPost) {
@@ -73,38 +80,8 @@ try {
       "Successfully fetched i-nostri-corsi post from WordPress.com API"
     );
 
-    // Fetch subpages using the specific endpoint for parent_id=33
-    console.log("Fetching subpages with parent_id=33...");
-    try {
-      const { data: subpagesResponse } = await axios.get<WordPressApiResponse>(
-        `${WORDPRESS_API_BASE}/posts/?type=page&parent_id=33`
-      );
-
-      if (subpagesResponse && subpagesResponse.posts) {
-        subpages = cleanTextInArray(
-          subpagesResponse.posts
-            .map((page: any) => ({
-              id: page.ID,
-              title: page.title || "",
-              excerpt: page.excerpt || "",
-              slug: page.slug,
-              featured_image: page.featured_image || "",
-              date: page.date || "", // Creation date
-              modified: page.modified || "", // Last modified date
-            }))
-            .sort((a: Subpage, b: Subpage) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by creation date, oldest first
-        );
-        
-        console.log(`Found ${subpages.length} subpages with parent_id=33 (ordered by creation date)`);
-        subpages.forEach((page) => {
-          console.log(`- ${page.title} (ID: ${page.id}, Slug: ${page.slug}, Created: ${page.date}, Modified: ${page.modified})`);
-        });
-      } else {
-        console.log("No subpages found with parent_id=33");
-      }
-    } catch (subpagesError) {
-      console.error("Error fetching subpages:", subpagesError);
-    }
+    // Fetch subpages using optimized utility
+    subpages = await fetchSubpages();
   } else {
     console.log("i-nostri-corsi post not found, redirecting to 404");
     return Astro.redirect("/404");
