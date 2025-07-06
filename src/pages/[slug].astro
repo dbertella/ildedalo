@@ -5,6 +5,8 @@ import Footer from '../components/Footer.jsx';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import { WORDPRESS_API_BASE } from '../config/wordpress.js';
+import { downloadImage } from '../utils/imageUtils.js';
 
 const { slug } = Astro.params;
 
@@ -21,63 +23,17 @@ interface WordPressContent {
   type: 'post' | 'page';
 }
 
-// Helper to download images
-async function downloadImage(url: string, localPath: string) {
-  try {
-    const writer = fs.createWriteStream(localPath);
-    const response = await axios.get(url, { responseType: 'stream' });
-    (response.data as NodeJS.ReadableStream).pipe(writer);
-    return new Promise<void>((resolve, reject) => {
-      writer.on('finish', () => resolve());
-      writer.on('error', reject);
-    });
-  } catch (error) {
-    console.error('Failed to download image:', url, error);
-    throw error;
-  }
-}
+
 
 let contentData: WordPressContent | null = null;
 let localImages: Record<string, string> = {};
 
-// Sample pages for fallback
-const samplePages: Record<string, WordPressContent> = {
-  'chi-siamo': {
-    ID: 1,
-    title: 'Chi Siamo',
-    content: '<p>Il Centro Dedalo è un centro di formazione professionale nato dalla passione per l\'insegnamento e dalla volontà di offrire opportunità di crescita personale e professionale.</p><p>La nostra missione è quella di creare uno spazio di apprendimento dove ogni persona possa sviluppare le proprie competenze e raggiungere i propri obiettivi.</p><p>I nostri docenti sono esperti del settore con anni di esperienza nel campo della formazione e dell\'insegnamento.</p>',
-    excerpt: 'Scopri la storia e la missione del Centro Dedalo',
-    date: '2024-01-15T10:00:00',
-    modified: '2024-01-15T10:00:00',
-    slug: 'chi-siamo',
-    type: 'page'
-  },
-  'i-nostri-corsi': {
-    ID: 2,
-    title: 'I Nostri Corsi',
-    content: '<p>Offriamo una vasta gamma di corsi di formazione professionale in diverse aree:</p><ul><li><strong>Informatica:</strong> Programmazione, Web Design, Office Automation</li><li><strong>Marketing:</strong> Digital Marketing, Social Media Management</li><li><strong>Gestione Aziendale:</strong> Project Management, Leadership</li><li><strong>Lingue:</strong> Inglese, Spagnolo, Tedesco</li></ul><p>Tutti i nostri corsi sono progettati per essere pratici e immediatamente applicabili nel mondo del lavoro.</p>',
-    excerpt: 'Esplora la nostra offerta formativa completa',
-    date: '2024-01-16T14:30:00',
-    modified: '2024-01-16T14:30:00',
-    slug: 'i-nostri-corsi',
-    type: 'page'
-  },
-  'contatti': {
-    ID: 3,
-    title: 'Contatti',
-    content: '<p>Per informazioni sui nostri corsi e servizi, puoi contattarci:</p><p><strong>Email:</strong> info.ildedalo@gmail.com<br><strong>Telefono:</strong> +39 123 456 7890<br><strong>Indirizzo:</strong> Via del Centro, 123 - Casatenovo (LC)</p><p><strong>Orari di apertura:</strong><br>Lunedì - Venerdì: 9:00 - 18:00<br>Sabato: 9:00 - 12:00</p>',
-    excerpt: 'Come contattarci per informazioni sui corsi',
-    date: '2024-01-17T09:15:00',
-    modified: '2024-01-17T09:15:00',
-    slug: 'contatti',
-    type: 'page'
-  }
-};
+
 
 try {
   // First try to fetch as a post
   console.log(`Trying to fetch post with slug: ${slug}`);
-  const { data: rawPost } = await axios.get(`https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/posts/slug:${slug}`);
+  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:${slug}`);
   
   if (rawPost) {
     const post = rawPost as any;
@@ -99,7 +55,7 @@ try {
   
   try {
     // Try to fetch as a page
-    const { data: rawPage } = await axios.get(`https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/pages/slug:${slug}`);
+    const { data: rawPage } = await axios.get(`${WORDPRESS_API_BASE}/pages/slug:${slug}`);
     
     if (rawPage) {
       const page = rawPage as any;
@@ -117,25 +73,8 @@ try {
       console.log(`Successfully fetched page with slug ${slug} from WordPress.com API`);
     }
   } catch (pageError) {
-    console.log(`Page not found either, using fallback content for: ${slug}`);
-    
-    // Use sample page if available
-    if (slug && samplePages[slug]) {
-      contentData = samplePages[slug];
-      console.log(`Using sample page content for: ${slug}`);
-    } else {
-      // Create a generic not found page
-      contentData = {
-        ID: 0,
-        title: 'Pagina non trovata',
-        content: `<p>La pagina "${slug}" non esiste o non è disponibile.</p><p>Puoi tornare alla <a href="/">homepage</a> o esplorare le nostre <a href="/news">news</a>.</p>`,
-        excerpt: 'Pagina non trovata',
-        date: '',
-        modified: '',
-        slug: slug ?? '',
-        type: 'page'
-      };
-    }
+    console.log(`Page not found, redirecting to 404 for: ${slug}`);
+    return Astro.redirect('/404');
   }
 }
 

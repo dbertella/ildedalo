@@ -5,6 +5,8 @@ import Footer from '../components/Footer.jsx';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import { WORDPRESS_API_BASE } from '../config/wordpress.js';
+import { downloadImage } from '../utils/imageUtils.js';
 
 // Define types for WordPress response
 interface WordPressContent {
@@ -19,21 +21,7 @@ interface WordPressContent {
   type: 'post' | 'page';
 }
 
-// Helper to download images
-async function downloadImage(url: string, localPath: string) {
-  try {
-    const writer = fs.createWriteStream(localPath);
-    const response = await axios.get(url, { responseType: 'stream' });
-    (response.data as NodeJS.ReadableStream).pipe(writer);
-    return new Promise<void>((resolve, reject) => {
-      writer.on('finish', () => resolve());
-      writer.on('error', reject);
-    });
-  } catch (error) {
-    console.error('Failed to download image:', url, error);
-    throw error;
-  }
-}
+
 
 let contentData: WordPressContent | null = null;
 let localImages: Record<string, string> = {};
@@ -41,7 +29,7 @@ let localImages: Record<string, string> = {};
 try {
   // First try to fetch as a post with slug 'home'
   console.log('Trying to fetch home as post from WordPress.com API');
-  const { data: rawPost } = await axios.get('https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/posts/slug:home');
+  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:home`);
   
   if (rawPost) {
     const post = rawPost as any;
@@ -57,9 +45,12 @@ try {
       type: 'post'
     };
     console.log('Successfully fetched home post from WordPress.com API');
+  } else {
+    return Astro.redirect('/404');
   }
 } catch (postError) {
-  console.log('Home post not found, trying as page');
+  console.log('Home post not found, redirecting to 404');
+  return Astro.redirect('/404');
 }
 
 // Process images if we have content
