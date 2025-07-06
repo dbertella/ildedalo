@@ -3,13 +3,12 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import FeatureImage from "../components/FeatureImage.jsx";
-import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { WORDPRESS_API_BASE } from "../config/wordpress.js";
 import { downloadImage } from "../utils/imageUtils.js";
 import { decodeHtmlEntitiesInObject } from "../utils/htmlUtils.js";
 import { fetchSubpages } from "../utils/courseUtils.js";
+import { fetchPost } from "../utils/postUtils.js";
 
 // Define types for WordPress response
 interface WordPressContent {
@@ -51,29 +50,20 @@ let localImages: Record<string, string> = {};
 let subpages: Subpage[] = [];
 
 try {
-  // Fetch the i-nostri-corsi post with timeout and caching
+  // Use the optimized fetchPost function
   console.log("Trying to fetch i-nostri-corsi post from WordPress.com API");
-  const { data: rawPost } = await axios.get(
-    `${WORDPRESS_API_BASE}/posts/slug:i-nostri-corsi`,
-    {
-      timeout: 1000, // 1 second timeout
-      headers: {
-        'Cache-Control': 'max-age=300' // Cache for 5 minutes
-      }
-    }
-  );
+  const rawPost = await fetchPost('i-nostri-corsi');
 
   if (rawPost) {
-    const post = rawPost as any;
     contentData = decodeHtmlEntitiesInObject({
-      ID: post.ID,
-      title: post.title || "",
-      content: post.content || "",
-      excerpt: post.excerpt || "",
-      date: post.date,
-      modified: post.modified,
-      slug: post.slug,
-      featured_image: (post.featured_image ?? "") as string,
+      ID: rawPost.ID,
+      title: rawPost.title || "",
+      content: rawPost.content || "",
+      excerpt: rawPost.excerpt || "",
+      date: rawPost.date,
+      modified: rawPost.modified,
+      slug: rawPost.slug,
+      featured_image: (rawPost.featured_image ?? "") as string,
       type: "post",
     });
     console.log(

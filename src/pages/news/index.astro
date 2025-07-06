@@ -4,11 +4,10 @@ import Header from '../../components/Header.jsx';
 import BlogList from '../../components/BlogList.jsx';
 import Footer from '../../components/Footer.jsx';
 import FeatureImage from '../../components/FeatureImage.jsx';
-import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import { WORDPRESS_API_BASE } from '../../config/wordpress.js';
 import { processImagesInContent } from '../../utils/imageUtils.js';
+import { fetchPosts } from '../../utils/postUtils.js';
 
 // Define types for WordPress API response
 interface WordPressPost {
@@ -38,41 +37,12 @@ interface WordPressPost {
 let posts: WordPressPost[] = [];
 
 try {
-  const { data: rawPosts } = await axios.get(`${WORDPRESS_API_BASE}/posts`, {
-    timeout: 1000, // 1 second timeout
-    params: {
-      number: 10,
-      fields: 'ID,slug,title,excerpt,content,date,modified,author,featured_image'
-    }
-  });
+  posts = await fetchPosts(10);
   
-  // Convert WordPress.com API response to our format
-  posts = (rawPosts as any).posts.map((post: any) => ({
-    id: post.ID,
-    slug: post.slug,
-    title: {
-      rendered: post.title || ''
-    },
-    excerpt: {
-      rendered: post.excerpt || ''
-    },
-    content: {
-      rendered: post.content || ''
-    },
-    date: post.date,
-    modified: post.modified,
-    author: post.author?.ID || 1,
-    featured_media: post.featured_image ? 1 : 0,
-    _embedded: post.featured_image ? {
-      'wp:featuredmedia': [{
-        id: 1,
-        source_url: post.featured_image,
-        alt_text: post.title || ''
-      }]
-    } : null
-  }));
-  
-  console.log(`Successfully fetched ${posts.length} posts from WordPress.com API`);
+  if (posts.length === 0) {
+    console.log('No posts found, redirecting to 404');
+    return Astro.redirect('/404');
+  }
 } catch (error) {
   console.error('Error fetching posts from WordPress.com API:', error);
   console.log('No posts found, redirecting to 404');

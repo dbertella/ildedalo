@@ -99,4 +99,66 @@ export function getCachedPost(slug) {
     return cached.data;
   }
   return null;
+}
+
+export async function fetchPosts(limit = 10) {
+  console.log(`Fetching ${limit} posts from WordPress.com API`);
+  
+  // Create a race between API call and timeout
+  const apiPromise = axios.get(
+    `${WORDPRESS_API_BASE}/posts`,
+    {
+      timeout: 1000, // 1 second timeout
+      params: {
+        number: limit,
+        fields: 'ID,slug,title,excerpt,content,date,modified,author,featured_image'
+      }
+    }
+  );
+
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('API timeout')), 800); // 800ms timeout
+  });
+
+  try {
+    const { data: rawPosts } = await Promise.race([apiPromise, timeoutPromise]);
+
+    if (rawPosts && rawPosts.posts) {
+      // Convert WordPress.com API response to our format
+      const posts = rawPosts.posts.map((post) => ({
+        id: post.ID,
+        slug: post.slug,
+        title: {
+          rendered: post.title || ''
+        },
+        excerpt: {
+          rendered: post.excerpt || ''
+        },
+        content: {
+          rendered: post.content || ''
+        },
+        date: post.date,
+        modified: post.modified,
+        author: post.author?.ID || 1,
+        featured_media: post.featured_image ? 1 : 0,
+        _embedded: post.featured_image ? {
+          'wp:featuredmedia': [{
+            id: 1,
+            source_url: post.featured_image,
+            alt_text: post.title || ''
+          }]
+        } : null
+      }));
+
+      console.log(`Successfully fetched ${posts.length} posts from WordPress.com API`);
+      return posts;
+    } else {
+      console.log("No posts found, returning empty array");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching posts:", error.message);
+    console.log("Returning empty array due to error");
+    return [];
+  }
 } 

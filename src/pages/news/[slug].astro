@@ -4,11 +4,10 @@ import Header from '../../components/Header.jsx';
 import BlogPost from '../../components/BlogPost.jsx';
 import Footer from '../../components/Footer.jsx';
 import FeatureImage from '../../components/FeatureImage.jsx';
-import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import { WORDPRESS_API_BASE } from '../../config/wordpress.js';
 import { processImagesInContent } from '../../utils/imageUtils.js';
+import { fetchPost } from '../../utils/postUtils.js';
 
 const { slug } = Astro.params;
 
@@ -62,9 +61,7 @@ let childrenPages: any[] = [];
 
 try {
   console.log(`Fetching post with slug: ${slug}`);
-  const { data: rawPost } = await axios.get(`${WORDPRESS_API_BASE}/posts/slug:${slug}`, {
-    timeout: 1000 // 1 second timeout
-  });
+  const rawPost = await fetchPost(slug);
   
   console.log('Raw post data:', rawPost);
   
@@ -74,31 +71,29 @@ try {
     return Astro.redirect('/404');
   }
 
-  const rawPostData = rawPost as any;
-  
   // Sanitize the post data to remove circular references
   postData = {
-    id: rawPostData.ID,
-    slug: rawPostData.slug,
+    id: rawPost.ID,
+    slug: rawPost.slug,
     title: {
-      rendered: rawPostData.title || ''
+      rendered: rawPost.title || ''
     },
     excerpt: {
-      rendered: rawPostData.excerpt || ''
+      rendered: rawPost.excerpt || ''
     },
     content: {
-      rendered: rawPostData.content || ''
+      rendered: rawPost.content || ''
     },
-    date: rawPostData.date,
-    modified: rawPostData.modified,
-    author: rawPostData.author?.ID || 1,
-    featured_media: rawPostData.featured_image ? 1 : 0,
+    date: rawPost.date,
+    modified: rawPost.modified,
+    author: rawPost.author?.ID || 1,
+    featured_media: rawPost.featured_image ? 1 : 0,
     parent: 0, // WordPress.com API doesn't provide parent info for posts
-    _embedded: rawPostData.featured_image ? {
+    _embedded: rawPost.featured_image ? {
       'wp:featuredmedia': [{
         id: 1,
-        source_url: rawPostData.featured_image,
-        alt_text: rawPostData.title || ''
+        source_url: rawPost.featured_image,
+        alt_text: rawPost.title || ''
       }]
     } : null
   };
