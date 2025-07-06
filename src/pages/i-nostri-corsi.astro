@@ -23,9 +23,31 @@ interface WordPressContent {
   type: "post" | "page";
 }
 
+interface Subpage {
+  id: number;
+  title: string;
+  excerpt: string;
+  slug: string;
+  featured_image: string;
+  date: string;
+  modified: string;
+}
+
+interface WordPressApiResponse {
+  posts?: Array<{
+    ID: number;
+    title: string;
+    excerpt: string;
+    slug: string;
+    featured_image: string;
+    date: string;
+    modified: string;
+  }>;
+}
+
 let contentData: WordPressContent | null = null;
 let localImages: Record<string, string> = {};
-let subpages: any[] = [];
+let subpages: Subpage[] = [];
 
 try {
   // Fetch the i-nostri-corsi post
@@ -54,14 +76,14 @@ try {
     // Fetch subpages using the specific endpoint for parent_id=33
     console.log("Fetching subpages with parent_id=33...");
     try {
-      const { data: subpagesResponse } = await axios.get(
+      const { data: subpagesResponse } = await axios.get<WordPressApiResponse>(
         `${WORDPRESS_API_BASE}/posts/?type=page&parent_id=33`
       );
 
       if (subpagesResponse && subpagesResponse.posts) {
         subpages = cleanTextInArray(
           subpagesResponse.posts
-            .map((page) => ({
+            .map((page: any) => ({
               id: page.ID,
               title: page.title || "",
               excerpt: page.excerpt || "",
@@ -70,7 +92,7 @@ try {
               date: page.date || "", // Creation date
               modified: page.modified || "", // Last modified date
             }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by creation date, oldest first
+            .sort((a: Subpage, b: Subpage) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by creation date, oldest first
         );
         
         console.log(`Found ${subpages.length} subpages with parent_id=33 (ordered by creation date)`);
@@ -246,7 +268,7 @@ if (contentData && contentData.content) {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(255, 255, 255, 0.9));
+    background: linear-gradient(transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%);
     display: flex;
     align-items: center;
     justify-content: center;

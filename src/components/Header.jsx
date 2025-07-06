@@ -18,6 +18,7 @@ const Header = () => {
   };
 
   const closeMenu = (e) => {
+    console.log('Close button clicked!');
     e.preventDefault();
     e.stopPropagation();
     setIsMenuOpen(false);
@@ -37,11 +38,11 @@ const Header = () => {
             </button>
             
             {isMenuOpen && (
-              <div className="menu-overlay">
+              <div className="menu-overlay" onClick={closeMenu}>
                 <button className="menu-close-button" onClick={closeMenu}>
                   ✕
                 </button>
-                <div className="menu-content">
+                <div className="menu-content" onClick={(e) => e.stopPropagation()}>
                   {menuItems.map((item) => (
                     <Link key={item.id} href={item.url} className="menu-link">
                       {item.title}
