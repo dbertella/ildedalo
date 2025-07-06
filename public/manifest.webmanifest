@@ -1,0 +1,26 @@
+{
+  "name": "Il dedalo - Soul Space",
+  "short_name": "Il dedalo",
+  "start_url": "/",
+  "background_color": "#669999",
+  "theme_color": "#669999",
+  "display": "minimal-ui",
+
+  "icons": [
+    { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
+    { "src": "/static/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/static/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    {
+      "src": "/static/icon-192-maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

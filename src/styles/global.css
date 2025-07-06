@@ -1,0 +1,240 @@
+:root {
+  --wp--preset--color--black: #000000;
+  --wp--preset--color--cyan-bluish-gray: #abb8c3;
+  --wp--preset--color--white: #ffffff;
+  --wp--preset--color--pale-pink: #f78da7;
+  --wp--preset--color--vivid-red: #cf2e2e;
+  --wp--preset--color--luminous-vivid-orange: #ff6900;
+  --wp--preset--color--luminous-vivid-amber: #fcb900;
+  --wp--preset--color--light-green-cyan: #7bdcb5;
+  --wp--preset--color--vivid-green-cyan: #00d084;
+  --wp--preset--color--pale-cyan-blue: #8ed1fc;
+  --wp--preset--color--vivid-cyan-blue: #0693e3;
+  --wp--preset--color--vivid-purple: #9b51e0;
+  --wp--preset--color--primary: #007cba;
+  --wp--preset--color--secondary: #006ba1;
+  --wp--preset--color--foreground: #333333;
+  --wp--preset--color--background: #ffffff;
+  --wp--preset--color--tertiary: #F0F0F0;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.head-container {
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+.main-content {
+  width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Blog List Styles */
+.blog-list-container {
+  width: 100%;
+  margin: 0;
+  padding: 24px;
+  list-style: none;
+}
+
+.blog-list-item {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.blog-list-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.item-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.item-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  margin: 0 0 8px 0;
+  color: rgba(12, 17, 43, 0.9);
+  font-weight: 400;
+  font-size: 1.2em;
+}
+
+.item-excerpt {
+  color: rgba(12, 17, 43, 0.7);
+  line-height: 1.5;
+  font-size: 0.9em;
+}
+
+/* Blog Post Styles */
+.blog-post {
+  width: 100%;
+}
+
+.post-container {
+  width: 800px;
+  margin: 0;
+  padding: 24px;
+}
+
+.post-title {
+  margin: 0;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: rgba(12, 17, 43, 0.8);
+  font-weight: 400;
+}
+
+.featured-image-container {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.featured-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-content {
+  color: rgba(12, 17, 43, 0.8);
+  word-break: break-word;
+}
+
+.post-content * {
+  max-width: 100%;
+}
+
+.post-content p {
+  line-height: 1.6em;
+}
+
+.post-content img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
+}
+
+.post-content figure {
+  margin: 24px auto;
+  width: 100%;
+}
+
+.post-content figure figcaption {
+  font-size: 0.7em;
+}
+
+.post-content iframe {
+  display: block;
+  margin: auto;
+}
+
+.post-content blockquote {
+  margin: 16px 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-left: 4px solid rgba(12, 17, 43);
+  padding: 4px 16px;
+}
+
+.post-content a {
+  color: #784c15;
+  text-decoration: underline;
+}
+
+.desktop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.child-page-item {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.child-page-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-to-parent {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.back-to-parent a {
+  color: #784c15;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    width: 100%;
+    padding: 16px;
+  }
+  
+  .post-container {
+    width: 100%;
+    padding: 16px;
+  }
+  
+  .item-content {
+    flex-direction: column;
+  }
+  
+  .item-image {
+    width: 100%;
+    height: 200px;
+  }
+} 

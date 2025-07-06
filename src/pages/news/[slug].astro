@@ -1,0 +1,223 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.jsx';
+import BlogPost from '../../components/BlogPost.jsx';
+import Footer from '../../components/Footer.jsx';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+
+const { slug } = Astro.params;
+
+// Define types for WordPress API response
+interface WordPressPost {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  content: { rendered: string };
+  date: string;
+  modified: string;
+  author: number;
+  featured_media: number;
+  parent: number;
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      id: number;
+      source_url: string;
+      alt_text: string;
+    }>;
+  } | null;
+}
+
+interface WordPressPage {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  content: { rendered: string };
+  date: string;
+  modified: string;
+  author: number;
+  featured_media: number;
+  parent: number;
+  menu_order: number;
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      id: number;
+      source_url: string;
+      alt_text: string;
+    }>;
+  } | null;
+}
+
+// Helper to download images
+async function downloadImage(url: string, localPath: string) {
+  try {
+    const writer = fs.createWriteStream(localPath);
+    const response = await axios.get(url, { responseType: 'stream' });
+    (response.data as NodeJS.ReadableStream).pipe(writer);
+    return new Promise<void>((resolve, reject) => {
+      writer.on('finish', () => resolve());
+      writer.on('error', reject);
+    });
+  } catch (error) {
+    console.error('Failed to download image:', url, error);
+    throw error;
+  }
+}
+
+// Helper to process images in content
+async function processImagesInContent(content: string): Promise<string> {
+  const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
+  let match;
+  let newContent = content;
+  
+  while ((match = imgRegex.exec(content)) !== null) {
+    const imgUrl = match[1] as string;
+    const imgName = path.basename(imgUrl.split('?')[0]);
+    const localPath = path.join(process.cwd(), 'public', imgName);
+    const publicPath = `/${imgName}`;
+    
+    // Download if not already present
+    if (!fs.existsSync(localPath)) {
+      try {
+        await downloadImage(imgUrl, localPath);
+        console.log(`Downloaded image: ${imgName}`);
+      } catch (e) {
+        console.error('Failed to download image:', imgUrl, e);
+      }
+    }
+    
+    // Replace src in content
+    newContent = newContent.replace(new RegExp(imgUrl, 'g'), publicPath);
+  }
+  
+  return newContent;
+}
+
+// Fetch post data from API
+let postData: any = null;
+let childrenPages: any[] = [];
+
+try {
+  console.log(`Fetching post with slug: ${slug}`);
+  const { data: rawPost } = await axios.get(`https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/posts/slug:${slug}`);
+  
+  console.log('Raw post data:', rawPost);
+  
+  // If no post found, return 404
+  if (!rawPost) {
+    console.log('No post found, redirecting to 404');
+    return Astro.redirect('/404');
+  }
+
+  const rawPostData = rawPost as any;
+  
+  // Sanitize the post data to remove circular references
+  postData = {
+    id: rawPostData.ID,
+    slug: rawPostData.slug,
+    title: {
+      rendered: rawPostData.title || ''
+    },
+    excerpt: {
+      rendered: rawPostData.excerpt || ''
+    },
+    content: {
+      rendered: rawPostData.content || ''
+    },
+    date: rawPostData.date,
+    modified: rawPostData.modified,
+    author: rawPostData.author?.ID || 1,
+    featured_media: rawPostData.featured_image ? 1 : 0,
+    parent: 0, // WordPress.com API doesn't provide parent info for posts
+    _embedded: rawPostData.featured_image ? {
+      'wp:featuredmedia': [{
+        id: 1,
+        source_url: rawPostData.featured_image,
+        alt_text: rawPostData.title || ''
+      }]
+    } : null
+  };
+
+  console.log('Successfully fetched post from WordPress.com API');
+} catch (error) {
+  console.error('Error fetching post from WordPress.com API:', error);
+  console.log('Using sample data for development');
+  
+  // Try to find the post in sample data
+  const samplePosts: { [key: string]: any } = {
+    'benvenuti-al-centro-dedalo': {
+      id: 1,
+      slug: 'benvenuti-al-centro-dedalo',
+      title: { rendered: 'Benvenuti al Centro Dedalo' },
+      excerpt: { rendered: 'Scopri i nostri corsi di formazione professionale e le opportunità di crescita personale.' },
+      content: { rendered: '<p>Il Centro Dedalo è un centro di formazione professionale che offre corsi di alta qualità per aiutarti a sviluppare le tue competenze e raggiungere i tuoi obiettivi professionali.</p><p>La nostra missione è fornire formazione di eccellenza attraverso metodologie innovative e docenti esperti del settore.</p>' },
+      date: '2024-01-15T10:00:00',
+      modified: '2024-01-15T10:00:00',
+      author: 1,
+      featured_media: 0,
+      parent: 0,
+      _embedded: null
+    },
+    'corsi-disponibili': {
+      id: 2,
+      slug: 'corsi-disponibili',
+      title: { rendered: 'I Nostri Corsi Disponibili' },
+      excerpt: { rendered: 'Esplora la nostra vasta gamma di corsi di formazione professionale.' },
+      content: { rendered: '<p>Offriamo corsi in diverse aree: informatica, marketing, gestione aziendale e molto altro. Tutti i nostri corsi sono tenuti da esperti del settore.</p><p>I nostri programmi sono progettati per essere pratici e immediatamente applicabili nel mondo del lavoro.</p>' },
+      date: '2024-01-16T14:30:00',
+      modified: '2024-01-16T14:30:00',
+      author: 1,
+      featured_media: 0,
+      parent: 0,
+      _embedded: null
+    },
+    'metodologia-didattica': {
+      id: 3,
+      slug: 'metodologia-didattica',
+      title: { rendered: 'La Nostra Metodologia Didattica' },
+      excerpt: { rendered: 'Scopri come il nostro approccio didattico innovativo può aiutarti a imparare in modo efficace.' },
+      content: { rendered: '<p>Utilizziamo metodologie didattiche moderne e innovative, combinando teoria e pratica per garantire un apprendimento efficace e duraturo.</p><p>Il nostro approccio si basa su casi studio reali e progetti pratici che ti permetteranno di applicare immediatamente ciò che impari.</p>' },
+      date: '2024-01-17T09:15:00',
+      modified: '2024-01-17T09:15:00',
+      author: 1,
+      featured_media: 0,
+      parent: 0,
+      _embedded: null
+    }
+  };
+  
+  postData = slug ? samplePosts[slug] || null : null;
+  
+  if (!postData) {
+    return Astro.redirect('/404');
+  }
+}
+
+// Ensure we have post data
+if (!postData) {
+  return Astro.redirect('/404');
+}
+
+// Process images in post content
+if (postData.content.rendered) {
+  postData.content.rendered = await processImagesInContent(postData.content.rendered);
+}
+if (postData.excerpt.rendered) {
+  postData.excerpt.rendered = await processImagesInContent(postData.excerpt.rendered);
+}
+---
+
+<Layout title={postData.title.rendered} description={postData.excerpt.rendered.replace(/<[^>]*>/g, '')}>
+  <Header slot="header" client:load />
+  
+  <div class="main-content">
+    <BlogPost post={postData} childrenPages={childrenPages as any} client:load />
+  </div>
+  
+  <Footer slot="footer" />
+</Layout>
+
+ 

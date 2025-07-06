@@ -1,16 +1,107 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.jsx';
+import Footer from '../components/Footer.jsx';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
+// Define types for WordPress response
+interface WordPressContent {
+  ID: number;
+  title: string;
+  content: string;
+  excerpt: string;
+  date: string;
+  modified: string;
+  slug: string;
+  featured_image?: string;
+  type: 'post' | 'page';
+}
+
+// Helper to download images
+async function downloadImage(url: string, localPath: string) {
+  try {
+    const writer = fs.createWriteStream(localPath);
+    const response = await axios.get(url, { responseType: 'stream' });
+    (response.data as NodeJS.ReadableStream).pipe(writer);
+    return new Promise<void>((resolve, reject) => {
+      writer.on('finish', () => resolve());
+      writer.on('error', reject);
+    });
+  } catch (error) {
+    console.error('Failed to download image:', url, error);
+    throw error;
+  }
+}
+
+let contentData: WordPressContent | null = null;
+let localImages: Record<string, string> = {};
+
+try {
+  // First try to fetch as a post with slug 'home'
+  console.log('Trying to fetch home as post from WordPress.com API');
+  const { data: rawPost } = await axios.get('https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/posts/slug:home');
+  
+  if (rawPost) {
+    const post = rawPost as any;
+    contentData = {
+      ID: post.ID,
+      title: post.title || '',
+      content: post.content || '',
+      excerpt: post.excerpt || '',
+      date: post.date,
+      modified: post.modified,
+      slug: post.slug,
+      featured_image: (post.featured_image ?? '') as string,
+      type: 'post'
+    };
+    console.log('Successfully fetched home post from WordPress.com API');
+  }
+} catch (postError) {
+  console.log('Home post not found, trying as page');
+}
+
+// Process images if we have content
+if (contentData && contentData.content) {
+  // Find all image URLs in the content
+  const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
+  let match;
+  let newContent = contentData.content;
+  
+  while ((match = imgRegex.exec(contentData.content)) !== null) {
+    const imgUrl = match[1] as string;
+    const imgName = path.basename(imgUrl.split('?')[0]);
+    const localPath = path.join(process.cwd(), 'public', imgName);
+    const publicPath = `/${imgName}`;
+    
+    // Download if not already present
+    if (!fs.existsSync(localPath)) {
+      try {
+        await downloadImage(imgUrl, localPath);
+        console.log(`Downloaded image: ${imgName}`);
+      } catch (e) {
+        console.error('Failed to download image:', imgUrl, e);
+      }
+    }
+    
+    localImages[imgUrl] = publicPath;
+    // Replace src in content
+    newContent = newContent.replace(new RegExp(imgUrl, 'g'), publicPath);
+  }
+  
+  contentData.content = newContent;
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={contentData?.title || "Il Dedalo - Centro di Formazione"}>
+  <Header slot="header" client:load />
+  
+  <div class="main-content">
+    {contentData && (
+      <div class="post-content" set:html={contentData.content} />
+    )}
+  </div>
+  
+  <Footer slot="footer" />
+</Layout>

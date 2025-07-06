@@ -1,0 +1,178 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.jsx';
+import BlogList from '../../components/BlogList.jsx';
+import Footer from '../../components/Footer.jsx';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+
+// Define types for WordPress API response
+interface WordPressPost {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  content: { rendered: string };
+  date: string;
+  modified: string;
+  author: number;
+  featured_media: number;
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      id: number;
+      source_url: string;
+      alt_text: string;
+    }>;
+  } | null;
+}
+
+// Helper to download images
+async function downloadImage(url: string, localPath: string) {
+  try {
+    const writer = fs.createWriteStream(localPath);
+    const response = await axios.get(url, { responseType: 'stream' });
+    (response.data as NodeJS.ReadableStream).pipe(writer);
+    return new Promise<void>((resolve, reject) => {
+      writer.on('finish', () => resolve());
+      writer.on('error', reject);
+    });
+  } catch (error) {
+    console.error('Failed to download image:', url, error);
+    throw error;
+  }
+}
+
+// Helper to process images in content
+async function processImagesInContent(content: string): Promise<string> {
+  const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
+  let match;
+  let newContent = content;
+  
+  while ((match = imgRegex.exec(content)) !== null) {
+    const imgUrl = match[1] as string;
+    const imgName = path.basename(imgUrl.split('?')[0]);
+    const localPath = path.join(process.cwd(), 'public', imgName);
+    const publicPath = `/${imgName}`;
+    
+    // Download if not already present
+    if (!fs.existsSync(localPath)) {
+      try {
+        await downloadImage(imgUrl, localPath);
+        console.log(`Downloaded image: ${imgName}`);
+      } catch (e) {
+        console.error('Failed to download image:', imgUrl, e);
+      }
+    }
+    
+    // Replace src in content
+    newContent = newContent.replace(new RegExp(imgUrl, 'g'), publicPath);
+  }
+  
+  return newContent;
+}
+
+// Sample data for development when API is not available
+const samplePosts: WordPressPost[] = [
+  {
+    id: 1,
+    slug: 'benvenuti-al-centro-dedalo',
+    title: { rendered: 'Benvenuti al Centro Dedalo' },
+    excerpt: { rendered: 'Scopri i nostri corsi di formazione professionale e le opportunità di crescita personale.' },
+    content: { rendered: '<p>Il Centro Dedalo è un centro di formazione professionale che offre corsi di alta qualità per aiutarti a sviluppare le tue competenze e raggiungere i tuoi obiettivi professionali.</p>' },
+    date: '2024-01-15T10:00:00',
+    modified: '2024-01-15T10:00:00',
+    author: 1,
+    featured_media: 0,
+    _embedded: null
+  },
+  {
+    id: 2,
+    slug: 'corsi-disponibili',
+    title: { rendered: 'I Nostri Corsi Disponibili' },
+    excerpt: { rendered: 'Esplora la nostra vasta gamma di corsi di formazione professionale.' },
+    content: { rendered: '<p>Offriamo corsi in diverse aree: informatica, marketing, gestione aziendale e molto altro. Tutti i nostri corsi sono tenuti da esperti del settore.</p>' },
+    date: '2024-01-16T14:30:00',
+    modified: '2024-01-16T14:30:00',
+    author: 1,
+    featured_media: 0,
+    _embedded: null
+  },
+  {
+    id: 3,
+    slug: 'metodologia-didattica',
+    title: { rendered: 'La Nostra Metodologia Didattica' },
+    excerpt: { rendered: 'Scopri come il nostro approccio didattico innovativo può aiutarti a imparare in modo efficace.' },
+    content: { rendered: '<p>Utilizziamo metodologie didattiche moderne e innovative, combinando teoria e pratica per garantire un apprendimento efficace e duraturo.</p>' },
+    date: '2024-01-17T09:15:00',
+    modified: '2024-01-17T09:15:00',
+    author: 1,
+    featured_media: 0,
+    _embedded: null
+  }
+];
+
+// Fetch posts from WordPress.com public API
+let posts: WordPressPost[] = [];
+
+try {
+  const { data: rawPosts } = await axios.get('https://public-api.wordpress.com/rest/v1/sites/ildedaloadmin.wordpress.com/posts', {
+    params: {
+      number: 10,
+      fields: 'ID,slug,title,excerpt,content,date,modified,author,featured_image'
+    }
+  });
+  
+  // Convert WordPress.com API response to our format
+  posts = (rawPosts as any).posts.map((post: any) => ({
+    id: post.ID,
+    slug: post.slug,
+    title: {
+      rendered: post.title || ''
+    },
+    excerpt: {
+      rendered: post.excerpt || ''
+    },
+    content: {
+      rendered: post.content || ''
+    },
+    date: post.date,
+    modified: post.modified,
+    author: post.author?.ID || 1,
+    featured_media: post.featured_image ? 1 : 0,
+    _embedded: post.featured_image ? {
+      'wp:featuredmedia': [{
+        id: 1,
+        source_url: post.featured_image,
+        alt_text: post.title || ''
+      }]
+    } : null
+  }));
+  
+  console.log(`Successfully fetched ${posts.length} posts from WordPress.com API`);
+} catch (error) {
+  console.error('Error fetching posts from WordPress.com API:', error);
+  console.log('Using sample data for development');
+  posts = samplePosts;
+}
+
+// Process images in all posts
+for (const post of posts) {
+  if (post.content.rendered) {
+    post.content.rendered = await processImagesInContent(post.content.rendered);
+  }
+  if (post.excerpt.rendered) {
+    post.excerpt.rendered = await processImagesInContent(post.excerpt.rendered);
+  }
+}
+---
+
+<Layout title="News - Il Dedalo">
+  <Header slot="header" client:load />
+  
+  <div class="main-content">
+    <BlogList posts={posts} title="News" isTaxonomy={false} isAuthor={false} client:load />
+  </div>
+  
+  <Footer slot="footer" />
+</Layout> 

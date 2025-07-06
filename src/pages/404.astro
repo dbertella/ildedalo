@@ -1,0 +1,59 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.jsx';
+import Footer from '../components/Footer.jsx';
+---
+
+<Layout title="404 - Pagina non trovata">
+  <Header slot="header" />
+  
+  <div class="error-container">
+    <h1>404</h1>
+    <h2>Pagina non trovata</h2>
+    <p>La pagina che stai cercando non esiste.</p>
+    <a href="/" class="home-link">Torna alla home</a>
+  </div>
+  
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .error-container {
+    width: 800px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 4rem;
+    margin: 0;
+    color: rgba(12, 17, 43, 0.8);
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin: 16px 0;
+    color: rgba(12, 17, 43, 0.6);
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: rgba(12, 17, 43, 0.7);
+    margin-bottom: 32px;
+  }
+
+  .home-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #784c15;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .home-link:hover {
+    background-color: #5a3a10;
+  }
+</style> 
