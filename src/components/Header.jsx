@@ -17,6 +17,12 @@ const Header = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="header">
       <div className="container">
@@ -32,6 +38,9 @@ const Header = () => {
             
             {isMenuOpen && (
               <div className="menu-overlay">
+                <button className="menu-close-button" onClick={closeMenu}>
+                  ✕
+                </button>
                 <div className="menu-content">
                   {menuItems.map((item) => (
                     <Link key={item.id} href={item.url} className="menu-link">
