@@ -43,7 +43,7 @@
   font-weight: 400;
   color: #232323;
   margin: 0;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+  text-shadow: 2px 2px 4px 5px rgba(255, 255, 255, 0.8);
   line-height: 1.2;
   font-family: 'Montserrat', sans-serif;
 }

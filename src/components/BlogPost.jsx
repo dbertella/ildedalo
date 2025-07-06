@@ -35,15 +35,9 @@ const BlogPost = ({ post, childrenPages = [] }) => {
           </div>
         )}
 
-        {post.parent ? (
-          <div className="back-to-parent">
-            <Link href="/i-nostri-corsi/">Torna ai Corsi</Link>
-          </div>
-        ) : (
-          <div className="back-to-parent">
-            <Link href="/news/">Torna alle News</Link>
-          </div>
-        )}
+        <div className="back-to-parent">
+          <Link href="/news/">Torna alle News</Link>
+        </div>
       </div>
     </article>
   );
