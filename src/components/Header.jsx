@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from './Link';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ currentPath = '' }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -58,14 +58,22 @@ const Header = () => {
           <ul className="nav-list">
             {menuItems.map((item, index) => (
               <li key={index} className="nav-item">
-                <Link href={item.url} className="nav-link">
+                <Link 
+                  href={item.url} 
+                  className="nav-link"
+                  aria-current={currentPath === item.url ? 'page' : undefined}
+                >
                   {item.title}
                 </Link>
                 {item.children && item.children.length > 0 && (
                   <ul className="nav-dropdown">
                     {item.children.map((child, childIndex) => (
                       <li key={childIndex} className="nav-dropdown-item">
-                        <Link href={child.url} className="nav-dropdown-link">
+                        <Link 
+                          href={child.url} 
+                          className="nav-dropdown-link"
+                          aria-current={currentPath === child.url ? 'page' : undefined}
+                        >
                           {child.title}
                         </Link>
                       </li>

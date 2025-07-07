@@ -1,36 +1,14 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/Header.jsx';
-import BlogPost from '../../components/BlogPost.jsx';
-import Footer from '../../components/Footer.jsx';
-import FeatureImage from '../../components/FeatureImage.jsx';
-import { processImagesInContent } from '../../utils/imageUtils.js';
-import { fetchPost } from '../../utils/postUtils.js';
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.jsx";
+import BlogPost from "../../components/BlogPost.jsx";
+import Footer from "../../components/Footer.jsx";
+import FeatureImage from "../../components/FeatureImage.jsx";
+import { processImagesInContent } from "../../utils/imageUtils.js";
+import { fetchPost } from "../../utils/postUtils.js";
 
 const { slug } = Astro.params;
-
-// Define types for WordPress API response
-interface WordPressPost {
-  id: number;
-  slug: string;
-  title: { rendered: string };
-  excerpt: { rendered: string };
-  content: { rendered: string };
-  date: string;
-  modified: string;
-  author: number;
-  featured_media: number;
-  parent: number;
-  _embedded?: {
-    'wp:featuredmedia'?: Array<{
-      id: number;
-      source_url: string;
-      alt_text: string;
-    }>;
-  } | null;
-}
-
-
+const currentPath = Astro.url.pathname;
 
 // Fetch post data from API
 let postData: any = null;
@@ -38,11 +16,11 @@ let postData: any = null;
 try {
   console.log(`Fetching post with slug: ${slug}`);
   const rawPost = await fetchPost(slug);
-  
+
   // If no post found, return 404
   if (!rawPost) {
-    console.log('No post found, redirecting to 404');
-    return Astro.redirect('/404');
+    console.log("No post found, redirecting to 404");
+    return Astro.redirect("/404");
   }
 
   // Sanitize the post data to remove circular references
@@ -50,67 +28,73 @@ try {
     id: rawPost.ID,
     slug: rawPost.slug,
     title: {
-      rendered: rawPost.title || ''
+      rendered: rawPost.title || "",
     },
     excerpt: {
-      rendered: rawPost.excerpt || ''
+      rendered: rawPost.excerpt || "",
     },
     content: {
-      rendered: rawPost.content || ''
+      rendered: rawPost.content || "",
     },
     date: rawPost.date,
     modified: rawPost.modified,
     author: rawPost.author?.ID || 1,
     featured_media: rawPost.featured_image ? 1 : 0,
     parent: 0, // WordPress.com API doesn't provide parent info for posts
-    _embedded: rawPost.featured_image ? {
-      'wp:featuredmedia': [{
-        id: 1,
-        source_url: rawPost.featured_image,
-        alt_text: rawPost.title || ''
-      }]
-    } : null
+    _embedded: rawPost.featured_image
+      ? {
+          "wp:featuredmedia": [
+            {
+              id: 1,
+              source_url: rawPost.featured_image,
+              alt_text: rawPost.title || "",
+            },
+          ],
+        }
+      : null,
   };
 
-  console.log('Successfully fetched post from WordPress.com API');
+  console.log("Successfully fetched post from WordPress.com API");
 } catch (error) {
-  console.error('Error fetching post from WordPress.com API:', error);
-  console.log('Post not found, redirecting to 404');
-  return Astro.redirect('/404');
+  console.error("Error fetching post from WordPress.com API:", error);
+  console.log("Post not found, redirecting to 404");
+  return Astro.redirect("/404");
 }
 
 // Ensure we have post data
 if (!postData) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 
 // Process images in post content
 if (postData.content.rendered) {
-  postData.content.rendered = await processImagesInContent(postData.content.rendered);
+  postData.content.rendered = await processImagesInContent(
+    postData.content.rendered
+  );
 }
 if (postData.excerpt.rendered) {
-  postData.excerpt.rendered = await processImagesInContent(postData.excerpt.rendered);
+  postData.excerpt.rendered = await processImagesInContent(
+    postData.excerpt.rendered
+  );
 }
 ---
 
-<Layout 
-  title={`${postData.title.rendered} - Il Dedalo 🌿 Soul Space`} 
-  description={postData.excerpt.rendered.replace(/<[^>]*>/g, '')}
+<Layout
+  title={`${postData.title.rendered} - Il Dedalo 🌿 Soul Space`}
+  description={postData.excerpt.rendered.replace(/<[^>]*>/g, "")}
   url={`https://ildedalo.com/news/${slug}`}
 >
-  <Header slot="header" client:load />
-  
-  <FeatureImage 
-    imageUrl={postData._embedded?.['wp:featuredmedia']?.[0]?.source_url}
+  <Header slot="header" currentPath={currentPath} client:load />
+
+  <FeatureImage
+    imageUrl={postData._embedded?.["wp:featuredmedia"]?.[0]?.source_url}
     title={postData.title.rendered}
     client:load
   />
-  
+
   <div class="main-content">
     <BlogPost post={postData} client:load />
   </div>
-  
+
   <Footer slot="footer" />
 </Layout>
-
- 

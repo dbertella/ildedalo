@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import FeatureImage from '../components/FeatureImage.jsx';
+
+const currentPath = Astro.url.pathname;
 ---
 
 <Layout 
@@ -10,7 +12,7 @@ import FeatureImage from '../components/FeatureImage.jsx';
   description="La pagina che stai cercando non esiste. Torna alla homepage del Centro Dedalo."
   url="https://ildedalo.com/404"
 >
-  <Header slot="header" />
+  <Header slot="header" currentPath={currentPath} />
   
   <FeatureImage 
     imageUrl={undefined}

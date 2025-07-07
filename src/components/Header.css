@@ -219,6 +219,7 @@
   padding: 0 24px;
   margin: 0 auto;
   overflow-x: auto;
+  justify-content: center;
 }
 
 .nav-list {
@@ -228,6 +229,7 @@
   padding: 0;
   gap: 0;
   width: 100%;
+  justify-content: center;
 }
 
 .nav-item {
@@ -265,7 +267,7 @@
 }
 
 .nav-link[aria-current="page"] {
-  border-bottom-color: #232323;
+  border-bottom-color: #669999;
 }
 
 .nav-link:hover {

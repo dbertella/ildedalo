@@ -22,12 +22,17 @@ export async function fetchPost(slug) {
     return await fetchingPosts.get(slug);
   }
 
-  // Start fetching with immediate fallback option
+  // Start fetching with global timeout protection
   const fetchPromise = performPostFetch(slug);
   fetchingPosts.set(slug, fetchPromise);
   
+  // Add global timeout protection for serverless environment
+  const globalTimeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Global timeout')), 2000); // 2 second global timeout
+  });
+  
   try {
-    const result = await fetchPromise;
+    const result = await Promise.race([fetchPromise, globalTimeoutPromise]);
     return result;
   } catch (error) {
     console.error(`Failed to fetch post ${slug}, throwing error for 404 redirect`);
@@ -44,7 +49,7 @@ async function performPostFetch(slug) {
   const apiPromise = axios.get(
     `${WORDPRESS_API_BASE}/posts/slug:${slug}`,
     {
-      timeout: 1000, // 1 second timeout
+      timeout: 500, // 500ms timeout for serverless
       headers: {
         'Cache-Control': 'max-age=300'
       }
@@ -52,7 +57,7 @@ async function performPostFetch(slug) {
   );
 
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('API timeout')), 800); // 800ms timeout
+    setTimeout(() => reject(new Error('API timeout')), 400); // 400ms timeout
   });
 
   try {
@@ -108,7 +113,7 @@ export async function fetchPosts(limit = 10) {
   const apiPromise = axios.get(
     `${WORDPRESS_API_BASE}/posts`,
     {
-      timeout: 1000, // 1 second timeout
+      timeout: 500, // 500ms timeout for serverless
       params: {
         number: limit,
         fields: 'ID,slug,title,excerpt,content,date,modified,author,featured_image'
@@ -117,7 +122,7 @@ export async function fetchPosts(limit = 10) {
   );
 
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('API timeout')), 800); // 800ms timeout
+    setTimeout(() => reject(new Error('API timeout')), 400); // 400ms timeout
   });
 
   try {

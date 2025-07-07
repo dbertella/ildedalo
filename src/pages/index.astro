@@ -3,10 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import FeatureImage from '../components/FeatureImage.jsx';
-import fs from 'fs';
-import path from 'path';
-import { downloadImage } from '../utils/imageUtils.js';
 import { fetchPost } from '../utils/postUtils.js';
+
+const currentPath = Astro.url.pathname;
 
 // Define types for WordPress response
 interface WordPressContent {
@@ -22,7 +21,6 @@ interface WordPressContent {
 }
 
 let contentData: WordPressContent | null = null;
-let localImages: Record<string, string> = {};
 
 try {
   // Use the optimized fetchPost function
@@ -50,36 +48,7 @@ try {
   return Astro.redirect('/404');
 }
 
-// Process images if we have content
-if (contentData && contentData.content) {
-  // Find all image URLs in the content
-  const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
-  let match;
-  let newContent = contentData.content;
-  
-  while ((match = imgRegex.exec(contentData.content)) !== null) {
-    const imgUrl = match[1] as string;
-    const imgName = path.basename(imgUrl.split('?')[0]);
-    const localPath = path.join(process.cwd(), 'public', imgName);
-    const publicPath = `/${imgName}`;
-    
-    // Download if not already present
-    if (!fs.existsSync(localPath)) {
-      try {
-        await downloadImage(imgUrl, localPath);
-        console.log(`Downloaded image: ${imgName}`);
-      } catch (e) {
-        console.error('Failed to download image:', imgUrl, e);
-      }
-    }
-    
-    localImages[imgUrl] = publicPath;
-    // Replace src in content
-    newContent = newContent.replace(new RegExp(imgUrl, 'g'), publicPath);
-  }
-  
-  contentData.content = newContent;
-}
+// WordPress.com handles images through their CDN - no need to download them
 ---
 
 <Layout 
@@ -87,7 +56,7 @@ if (contentData && contentData.content) {
   description={contentData?.excerpt || "Il Dedalo è uno spazio per l'anima, la creatività, la cura e la bellezza di condividere."}
   url="https://ildedalo.com"
 >
-  <Header slot="header" client:load />
+  <Header slot="header" currentPath={currentPath} client:load />
   
   <FeatureImage 
     imageUrl={contentData?.featured_image}

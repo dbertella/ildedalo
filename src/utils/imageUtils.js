@@ -20,6 +20,13 @@ export async function downloadImage(url, localPath) {
 
 // Helper to process images in content
 export async function processImagesInContent(content) {
+  // In serverless environment, don't try to download images
+  // Just return the content as-is to avoid filesystem errors
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    console.log('Skipping image processing in serverless environment');
+    return content;
+  }
+  
   const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/g;
   let match;
   let newContent = content;
