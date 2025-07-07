@@ -4,8 +4,6 @@ import Header from '../../components/Header.jsx';
 import BlogPost from '../../components/BlogPost.jsx';
 import Footer from '../../components/Footer.jsx';
 import FeatureImage from '../../components/FeatureImage.jsx';
-import fs from 'fs';
-import path from 'path';
 import { processImagesInContent } from '../../utils/imageUtils.js';
 import { fetchPost } from '../../utils/postUtils.js';
 
@@ -32,38 +30,14 @@ interface WordPressPost {
   } | null;
 }
 
-interface WordPressPage {
-  id: number;
-  slug: string;
-  title: { rendered: string };
-  excerpt: { rendered: string };
-  content: { rendered: string };
-  date: string;
-  modified: string;
-  author: number;
-  featured_media: number;
-  parent: number;
-  menu_order: number;
-  _embedded?: {
-    'wp:featuredmedia'?: Array<{
-      id: number;
-      source_url: string;
-      alt_text: string;
-    }>;
-  } | null;
-}
-
 
 
 // Fetch post data from API
 let postData: any = null;
-let childrenPages: any[] = [];
 
 try {
   console.log(`Fetching post with slug: ${slug}`);
   const rawPost = await fetchPost(slug);
-  
-  console.log('Raw post data:', rawPost);
   
   // If no post found, return 404
   if (!rawPost) {
@@ -133,7 +107,7 @@ if (postData.excerpt.rendered) {
   />
   
   <div class="main-content">
-    <BlogPost post={postData} childrenPages={childrenPages as any} client:load />
+    <BlogPost post={postData} client:load />
   </div>
   
   <Footer slot="footer" />

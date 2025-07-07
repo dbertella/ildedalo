@@ -33,18 +33,6 @@ interface Subpage {
   modified: string;
 }
 
-interface WordPressApiResponse {
-  posts?: Array<{
-    ID: number;
-    title: string;
-    excerpt: string;
-    slug: string;
-    featured_image: string;
-    date: string;
-    modified: string;
-  }>;
-}
-
 let contentData: WordPressContent | null = null;
 let localImages: Record<string, string> = {};
 let subpages: Subpage[] = [];
