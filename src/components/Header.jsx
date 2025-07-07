@@ -43,6 +43,11 @@ const Header = ({ currentPath = '' }) => {
                   ✕
                 </button>
                 <div className="menu-content" onClick={(e) => e.stopPropagation()}>
+                <div className="mobile-logo">
+                    <Link href="/" className="styled-link">
+                      <div className="logo"></div>
+                    </Link>
+                  </div>
                   {menuItems.map((item) => (
                     <Link key={item.id} href={item.url} className="menu-link">
                       {item.title}

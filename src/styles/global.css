@@ -240,8 +240,9 @@ a {
 }
 
 .back-to-parent a {
-  color: #784c15;
-  text-decoration: underline;
+  color: #669999;
+  font-weight: 700;
+  font-size: 1.2rem;
 }
 
 /* Responsive Design */

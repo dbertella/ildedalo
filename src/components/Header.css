@@ -137,7 +137,7 @@
 
 /* Mobile Menu Overlay Styles */
 .menu-overlay {
-  background: linear-gradient(135deg, #f7f4e9 0%, #f0e68c 50%, #f4d03f 100%);
+  background: #669999;
   width: 100vw;
   height: 100vh;
   overflow: hidden auto;
@@ -179,10 +179,22 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  padding-top: 80px; /* Space for the X button */
+}
+
+.mobile-logo {
+  text-align: center;
+}
+
+.mobile-logo .logo {
+  width: 200px;
+  height: 100px;
+  background: url('/dedalo.png') center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: brightness(0) invert(1); /* Make logo white for better contrast on green background */
 }
 
 .menu-link {
@@ -194,7 +206,7 @@
   text-align: center;
   padding: 1.5rem 2rem;
   text-decoration: none;
-  color: #232323;
+  color: white;
   margin: 0.5rem 0;
   border-radius: 8px;
   transition: background-color 0.3s ease;
@@ -202,12 +214,13 @@
 
 .menu-link:hover,
 .menu-link:focus {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .menu-link[aria-current="page"] {
-  color: #784c15;
+  color: white;
   font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .nav-container {
